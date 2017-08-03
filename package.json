@@ -1,0 +1,19 @@
+{
+  "name": "deploy",
+  "version": "1.0.0",
+  "description": "Script creates new directory, makes git clone from your repo (from `master` branch) and send the resulting build to your server.",
+  "main": "deploy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomekbuszewski/Deploy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tomekbuszewski/Deploy/issues"
+  },
+  "homepage": "https://github.com/tomekbuszewski/Deploy#readme"
+}
