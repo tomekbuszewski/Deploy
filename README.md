@@ -14,6 +14,11 @@ Deploy connects with your SFTP account. In order for this script to work you nee
 7. Removing created earlier deploy directory (this can be omitted by using `-leave-build` argument).
 
 ## Installation
+Since it’s not a NPM package, you need to add this dependency in repo format:
+```
+yarn add git+ssh://git@github.com:tomekbuszewski/Deploy.git
+```
+
 ### Manually creating config file:
 Create `.deploy` file and place inside there following data in JSON format:
 ```javascript
