@@ -4,6 +4,8 @@ Script creates new directory, makes git clone from your repo (from `master` bran
 
 Deploy connects with your SFTP account. In order for this script to work you need to have ssh keys paired.
 
+Tested on macOS only.
+
 ## Route
 1. Creating directory names with current timestamp;
 2. Git-cloning default branch into that directory;
