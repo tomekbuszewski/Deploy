@@ -2,6 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const exec = require('child_process').exec;
 
+const args = process.argv;
+
+var config;
+
+const defaultConfig = {
+  'public': 'path/to/your/directory',
+  'user': 'username',
+  'host': 'yourhost.com',
+  'command': 'for example: yarn install'
+};
+
 // Function for running scripts inside node
 const run = function (command, cb) {
   exec(command, function (err, stdout, stderr) {
@@ -54,28 +65,84 @@ const remove = function () {
   };
 
   deleteFolderRecursive(currentDeployId);
-}
+  console.log('Current deployment directory removed.');
+};
 
 // Function that rsyncs stuff with stuff
 const rsync = function () {
   run('rsync -avH '+currentDeployId+'/ -e ssh ' + config.user + '@' + config.host + ':' + config.public, function (e, r) {
-    if (e) { console.log(e) } else { console.log(r)}
+    if (e) { console.log(e) } else {
+      console.log('Files sent', r);
+
+      if (args.indexOf('-leave-build') === -1) remove();
+    }
   });
-}
+};
 
 const currentDeployId = getNow();
-const config = getConfig();
 
 // Function for cleaning upload directory
 const clean = function(cb) {
   run('cd '+currentDeployId + ' && rm -rf .git .idea node_modules .gitignore yarn.lock', cb)
 };
 
+// Function for parsing arguments
+const getArgs = function() {
+  const r = {
+    'public': defaultConfig.public,
+    'user': defaultConfig.user,
+    'host': defaultConfig.host,
+    'command': defaultConfig.command
+  };
+
+  Array.prototype.forEach.call(args, function(arg, i) {
+    switch (arg) {
+      case '-p':
+        r.public = args[i + 1];
+        break;
+
+      case '-u':
+        r.user = args[i + 1];
+        break;
+
+      case '-h':
+        r.host = args[i + 1];
+        break;
+
+      case '-c':
+        r.command = args[i + 1];
+        break;
+    }
+  });
+
+  return r;
+};
+
 // Function for creating directory for the new deployment
-const createDir = function() {
+(function() {
+  if (!fs.existsSync('.deploy')) {
+    fs.writeFileSync('.deploy', '{\n' +
+      '  "public": "'+getArgs().public+'",\n' +
+      '  "user": "'+ getArgs().user+'",\n' +
+      '  "host": "'+ getArgs().host+'",\n' +
+      '  "command": "'+ getArgs().command+'"\n' +
+      '}', 'utf8');
+
+    if (getArgs().public === defaultConfig.public) {
+      console.warn('.deploy file created, please fill it.');
+      process.exit(1);
+    } else {
+      console.log('.deploy file created.');
+    }
+  }
+
   if (fs.existsSync(currentDeployId)) {
-    return;
+    console.log('Please remove build directory(ies) first');
+
+    process.exit(1);
   } else {
+    config = getConfig();
+
     fs.mkdirSync(currentDeployId);
     console.log('Directory ' + currentDeployId + ' created');
 
@@ -97,6 +164,4 @@ const createDir = function() {
       }
     })
   }
-};
-
-createDir();
+}());
