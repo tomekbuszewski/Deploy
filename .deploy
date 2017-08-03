@@ -1,0 +1,4 @@
+{
+    command: "yarn run prod",
+    public: "public_html/test"
+}
